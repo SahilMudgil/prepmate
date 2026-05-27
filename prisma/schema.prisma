@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?   // <--- THIS WAS MISSING
+  accounts      Account[]
+  sessions      Session[]    // <--- Change this to Session[]
+  documents     Document[]
+  createdAt     DateTime  @default(now())
+  testResults   TestResult[] // 🔥 ADD THIS LINE
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  title     String
+  fileUrl   String?  // 🔥 WE ARE ADDING THIS LINE! (The '?' makes it safe for older files)
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  chunks    Chunk[]
+
+  // ADD THIS EXACT LINE RIGHT HERE:
+  messages  Message[]
+  testResults   TestResult[] // 🔥 ADD THIS LINE
+}
+
+model Chunk {
+  id         String   @id @default(uuid())
+  content    String
+  embedding  Unsupported("vector(3072)")  // 🔥 Replaced Float[] with this
+  documentId String
+  // Update this line below:
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String   // <--- Removed @unique from here!
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  role       String   // Will be either "user" or "ai"
+  content    String   // The actual question or answer text
+  createdAt  DateTime @default(now())
+}
+
+model TestResult {
+  id           String   @id @default(cuid())
+  userId       String
+  documentId   String
+  score        Int
+  totalMarks   Int
+  difficulty   String
+  weakTopics   String[] // Stores the array of weak topics
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  document     Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
