@@ -375,7 +375,7 @@ export default function TestPage() {
                         <label 
                           key={i}
                           htmlFor={inputId}
-                          className={`cursor-pointer flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 w-full min-h-13 ${
+                          className={`cursor-pointer flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 w-full min-h-14 ${
                             isSelected 
                               ? "border-blue-600 bg-blue-50 shadow-sm" 
                               : "border-gray-200 bg-white hover:border-blue-300 hover:bg-gray-50"
@@ -403,7 +403,7 @@ export default function TestPage() {
                     <textarea
                       id={`answer-${key}`}
                       name={`answer-${key}`}
-                      className={`w-full border-2 rounded-xl mt-1 p-3 sm:p-5 min-h-30 sm:min-h-40 focus:ring-0 outline-none transition-all shadow-sm text-sm sm:text-base md:text-lg leading-relaxed ${
+                      className={`w-full border-2 rounded-xl mt-1 p-3 sm:p-5 min-h-32 sm:min-h-40 focus:ring-0 outline-none transition-all shadow-sm text-sm sm:text-base md:text-lg leading-relaxed ${
                         hasAnswered 
                           ? "border-blue-400 bg-white focus:border-blue-600" 
                           : "border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500"

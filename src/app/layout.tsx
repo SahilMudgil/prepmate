@@ -25,32 +25,42 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}>
+    <html lang="en" className="overflow-x-hidden scroll-smooth">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900 min-h-screen overflow-x-hidden flex flex-col`}>
         <Providers>
           
           {/* --- PERMANENT NAVBAR STARTS HERE --- */}
-          <nav className="w-full bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 sm:px-8 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm transition-all">
+          <nav className="w-full bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 sm:px-8 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm transition-all box-border">
             <Link 
               href="/" 
-              className="text-xl sm:text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-2"
+              className="text-xl sm:text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-2 shrink-0 select-none"
             >
-              {/* Added shrink-0 so the logo icon never gets squished */}
-              <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              {/* FIXED BOOK SVG: Completely replaced the broken path with a perfectly symmetrical Book Open icon */}
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="w-6 h-6 shrink-0 text-blue-600"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
-              PrepMate
+              <span>PrepMate</span>
             </Link>
             
-            {/* Added hidden sm:block to keep the mobile view uncluttered */}
-            <div className="hidden sm:block text-sm text-gray-500 font-medium">
+            {/* Kept hidden on small devices to keep mobile view clean */}
+            <div className="hidden sm:block text-sm text-gray-500 font-medium select-none">
               Your AI Study Companion
             </div>
           </nav>
           {/* --- PERMANENT NAVBAR ENDS HERE --- */}
 
-          {/* This is where all your individual pages render */}
-          <main className="min-h-screen">
+          {/* Core App Viewport container */}
+          <main className="flex-1 w-full box-border">
             {children}
           </main>
 
