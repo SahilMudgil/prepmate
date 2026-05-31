@@ -2,25 +2,25 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
-// Notice the type change here: params is now a Promise
+// Next.js 15 App Router Dynamic Parameter type definition
 export default async function ReviewPage({ params }: { params: Promise<{ id: string }> }) {
-  // 1. We must AWAIT the params to get the ID!
+  // 1. Await the asynchronous params object
   const { id } = await params;
 
-  // 2. Fetch the data from your database using the resolved ID
+  // 2. Fetch the data from the database using the resolved ID
   const testResult = await prisma.testResult.findUnique({
     where: { id: id },
   });
 
-  // If someone goes to an invalid URL, show a 404
+  // If the record does not exist, trigger a standard Next.js 404 page
   if (!testResult) {
     return notFound();
   }
 
-  // 3. Calculate percentage
+  // 3. Calculate percentage score
   const percentage = Math.round((testResult.score / testResult.totalMarks) * 100);
 
-  // 4. Parse the weak topics safely
+  // 4. Safely parse weak topics from JSON string or Array format
   let weakTopicsList: string[] = [];
   try {
     if (testResult.weakTopics) {
@@ -39,7 +39,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
 
         {/* SCORE SNAPSHOT */}
         <div className="bg-white border border-gray-100 rounded-2xl p-8 mb-8 text-center shadow-sm">
-          <h2 className="text-gray-500 font-semibold mb-2 uppercase tracking-wide">Your Score</h2>
+          <h2 className="text-gray-500 font-semibold mb-2 uppercase tracking-wide text-xs">Your Score</h2>
           <div className="text-6xl font-extrabold text-blue-600 mb-2">
             {testResult.score} <span className="text-3xl text-gray-400">/ {testResult.totalMarks}</span>
           </div>
@@ -54,7 +54,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
           <h3 className="text-xl font-bold text-orange-800 mb-4 flex items-center gap-2">
             🎯 Targeted Study Areas
           </h3>
-          <p className="text-orange-700/80 mb-6 text-sm">
+          <p className="text-orange-700 mb-6 text-sm">
             Based on your answers, we recommend reviewing these specific topics to improve your score next time:
           </p>
           
@@ -76,13 +76,13 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link 
             href={`/chat/${testResult.documentId}`} 
-            className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-xl hover:bg-blue-700 transition text-center shadow-sm"
+            className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-xl hover:bg-blue-700 transition-colors text-center shadow-sm cursor-pointer"
           >
             Review Material in Chat
           </Link>
           <Link 
             href="/" 
-            className="bg-white border border-gray-200 text-gray-700 font-semibold py-3 px-8 rounded-xl hover:bg-gray-50 transition text-center shadow-sm"
+            className="bg-white border border-gray-200 text-gray-700 font-semibold py-3 px-8 rounded-xl hover:bg-gray-50 transition-colors text-center shadow-sm cursor-pointer"
           >
             Back to Home
           </Link>

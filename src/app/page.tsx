@@ -41,8 +41,8 @@ export default function Home() {
         }
 
         if (resultsRes.ok) {
-          const resultsData = await resultsRes.json();
-          setTestResults(resultsData);
+          const testResultsData = await resultsRes.json();
+          setTestResults(testResultsData);
         }
       } catch (error) {
         console.error("Error fetching data", error);
@@ -88,17 +88,17 @@ export default function Home() {
   if (status === "unauthenticated") {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white p-10 rounded-2xl shadow-lg text-center max-w-md w-full border border-gray-100">
+        <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-lg text-center max-w-md w-full border border-gray-100">
           <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl">
             🎓
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to PrepMate</h1>
-          <p className="text-gray-500 mb-8 leading-relaxed">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Welcome to PrepMate</h1>
+          <p className="text-gray-500 mb-8 leading-relaxed text-sm sm:text-base">
             Your personal AI study companion. Upload documents, chat with your notes, and take AI-generated tests.
           </p>
           <button
             onClick={() => signIn("google")}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2 text-lg cursor-pointer"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2 text-base sm:text-lg cursor-pointer"
           >
             Sign in with Google
           </button>
@@ -108,16 +108,17 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
+      {/* Removed the max-w-7xl constraint here so it goes full width again */}
       <div className="w-full">
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h1 className="text-2xl font-bold text-gray-800">Welcome, {session?.user?.name || "Student"} 👋</h1>
-          <div className="flex items-center gap-6">
-            <Link href="/upload" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-5 sm:p-6 rounded-xl shadow-sm border border-gray-100">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Welcome, {session?.user?.name || "Student"} 👋</h1>
+          <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-4 sm:gap-6">
+            <Link href="/upload" className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-sm sm:font-medium transition-colors shadow-sm">
               + Upload New PDF
             </Link>
-            <button onClick={() => signOut()} className="text-gray-500 hover:text-red-600 font-medium transition-colors cursor-pointer">
+            <button onClick={() => signOut()} className="text-sm sm:text-base text-gray-500 hover:text-red-600 font-medium transition-colors cursor-pointer">
               Logout
             </button>
           </div>
@@ -125,21 +126,21 @@ export default function Home() {
 
         {/* Study Materials Section */}
         <div className="mb-12">
-          <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
             📚 Your Study Materials
           </h2>
 
           {documents.length === 0 ? (
-            <div className="text-center p-12 bg-white rounded-xl border-2 border-dashed border-gray-200">
-              <p className="text-gray-500 mb-4 text-lg">You haven't uploaded any materials yet.</p>
-              <Link href="/upload" className="text-blue-600 font-semibold hover:underline">
+            <div className="text-center p-8 sm:p-12 bg-white rounded-xl border-2 border-dashed border-gray-200">
+              <p className="text-gray-500 mb-4 text-base sm:text-lg">You haven't uploaded any materials yet.</p>
+              <Link href="/upload" className="text-blue-600 font-semibold hover:underline text-sm sm:text-base">
                 Click here to get started
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {documents.map((doc) => (
-                <div key={doc.id} className="relative bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-300 transition-all group h-full flex flex-col justify-between">
+                <div key={doc.id} className="relative bg-white p-5 sm:p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-300 transition-all group h-full flex flex-col justify-between">
                   <button
                     onClick={() => handleDelete(doc.id)}
                     className="absolute top-3 right-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all cursor-pointer shadow-sm border border-red-100 z-10"
@@ -157,21 +158,21 @@ export default function Home() {
                         <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <h3 className="font-semibold text-gray-800 text-lg truncate pr-8" title={doc.title}>
+                    <h3 className="font-semibold text-gray-800 text-base sm:text-lg truncate pr-8" title={doc.title}>
                       {doc.title || "Untitled Document"}
                     </h3>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-gray-100 flex items-center gap-3">
+                  <div className="mt-6 pt-4 border-t border-gray-100 flex flex-row items-center gap-3">
                     <Link
                       href={`/chat/${doc.id}`}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 rounded-lg text-sm font-bold transition-all shadow-md hover:shadow-lg"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg"
                     >
                       💬 Chat
                     </Link>
                     <Link
                       href={`/test/${doc.id}`}
-                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-center py-2.5 rounded-lg text-sm font-bold transition-all shadow-md hover:shadow-lg"
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-center py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg"
                     >
                       📝 Test
                     </Link>
@@ -184,38 +185,38 @@ export default function Home() {
 
         {/* 📈 Recent Test Scores Section */}
         <div>
-          <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
             📈 Recent Test Scores
           </h2>
           
           {testResults.length === 0 ? (
-            <div className="bg-white p-6 rounded-xl border border-gray-100 text-gray-500 text-center shadow-sm">
+            <div className="bg-white p-6 rounded-xl border border-gray-100 text-gray-500 text-center shadow-sm text-sm sm:text-base">
               Take a test to see your progress here!
             </div>
           ) : (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="max-h-75 overflow-y-auto">
+              {/* FIXED: max-h-75 is not a valid tailwind class, changed to max-h-80 */}
+              <div className="max-h-80 overflow-y-auto">
                 {testResults.map((result) => {
                   const percentage = Math.round((result.score / result.totalMarks) * 100);
                   const scoreColor = percentage >= 80 ? "text-emerald-600 bg-emerald-50" : percentage >= 50 ? "text-amber-600 bg-amber-50" : "text-red-600 bg-red-50";
 
-                  // 🔥 Wrapping the result in a Link to send the user to the review page
                   return (
                     <Link 
                       href={`/review/${result.id}`}
                       key={result.id}
                       className="block hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
                     >
-                      <div className="flex items-center justify-between p-5">
-                        <div>
-                          <h4 className="font-semibold text-gray-800">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-5 gap-3 sm:gap-0">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-semibold text-gray-800 text-sm sm:text-base truncate pr-2">
                             {result.document?.title || "Test Score"}
                           </h4>
-                          <span className="text-xs font-medium uppercase tracking-wider text-gray-500 mt-1 block">
+                          <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-gray-500 mt-1 block">
                             Difficulty: {result.difficulty}
                           </span>
                         </div>
-                        <div className={`font-bold px-4 py-2 rounded-lg ${scoreColor}`}>
+                        <div className={`font-bold text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg self-end sm:self-auto ${scoreColor}`}>
                           {result.score} / {result.totalMarks} ({percentage}%)
                         </div>
                       </div>
