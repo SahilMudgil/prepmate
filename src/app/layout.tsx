@@ -25,8 +25,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="overflow-x-hidden scroll-smooth">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900 min-h-screen overflow-x-hidden flex flex-col`}>
+    <html lang="en" className="scroll-smooth">
+      {/* Removed overflow-x-hidden from body and html so sticky headers work! */}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900 min-h-screen flex flex-col`}>
         <Providers>
           
           {/* --- PERMANENT NAVBAR STARTS HERE --- */}

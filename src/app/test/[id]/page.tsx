@@ -37,6 +37,7 @@ export default function TestPage() {
   const startTest = () => {
     setHasStarted(true);
     setLoading(true);
+    setError(null); // Reset error state on a new attempt
 
     fetch("/api/generate-test", {
       method: "POST",
@@ -137,7 +138,12 @@ export default function TestPage() {
       setEvaluationResult(result);
     } catch (error: any) {
       console.error("Error evaluating test:", error);
-      alert(error.message || "Something went wrong during evaluation.");
+      const rawError = error.message || "";
+      if (rawError.toLowerCase().includes("demand") || rawError.includes("503") || rawError.toLowerCase().includes("busy")) {
+        alert("PrepMate AI is currently handling too many requests. Please wait one minute and try submitting again!");
+      } else {
+        alert(error.message || "Something went wrong during evaluation.");
+      }
     } finally {
       setEvaluating(false);
     }
@@ -209,7 +215,46 @@ export default function TestPage() {
     );
   }
 
-  if (error) return <p className="p-4 sm:p-8 text-red-500 font-medium text-center text-sm sm:text-base">Error: {error}</p>;
+  // FIXED SINGLE ACTION ERROR UI
+  if (error) {
+    const isHighDemand = error.toLowerCase().includes("demand") || error.includes("503") || error.toLowerCase().includes("busy") || error.toLowerCase().includes("rate limit");
+
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans flex flex-col items-center pt-10 sm:pt-20">
+        <div className="w-full max-w-md">
+          <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full border border-gray-100 text-center">
+            {/* Warning Icon */}
+            <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-200">
+              <svg className="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
+              {isHighDemand ? "AI Engine is Busy" : "Generation Failed"}
+            </h1>
+            
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+              {isHighDemand 
+                ? "PrepMate AI is experiencing a brief high-demand spike. Please wait about 1 minute before trying to generate your test again." 
+                : error}
+            </p>
+            
+            <div>
+              <Link 
+                href="/" 
+                onClick={() => setError(null)}
+                className="block w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition text-sm sm:text-base text-center shadow-md cursor-pointer"
+              >
+                Back to Home
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!test || !test.sections) return <p className="p-4 sm:p-8 text-red-500 font-medium text-center text-sm sm:text-base">Failed to load test structure.</p>;
 
   // 2. RESULTS UI (Grades & Review Screen)
@@ -302,39 +347,44 @@ export default function TestPage() {
   const answeredQuestions = Object.keys(answers).filter(key => answers[key] && answers[key].trim() !== "").length;
   const progressPercentage = totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0;
 
-  // 3. UPGRADED ACTIVE TEST UI (Taking the Test)
+  // 3. ACTIVE TEST UI (Taking the Test)
   return (
     <div className="p-3 sm:p-6 md:p-8 max-w-4xl mx-auto font-sans relative">
       
       {/* --- STICKY HEADER & PROGRESS BAR --- */}
-      <div className="sticky top-0 z-50 bg-white p-4 sm:p-6 rounded-b-2xl shadow-md border-b border-gray-200 mb-6 sm:mb-10 flex flex-col gap-3 sm:gap-4 -mx-3 sm:mx-0">
-        <div className="flex flex-row justify-between items-center gap-2">
-          <div>
-             <h1 className="text-lg sm:text-2xl font-bold text-gray-800">Knowledge Check</h1>
-             <p className="text-blue-600 capitalize font-medium text-xs sm:text-sm mt-0.5">{difficulty} Mode</p>
-          </div>
-          <div className="flex gap-1.5 sm:gap-3">
-            <div className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold border flex items-center transition-colors whitespace-nowrap ${timeLeft < 60 ? "bg-red-50 text-red-600 border-red-200 animate-pulse" : "bg-orange-50 text-orange-600 border-orange-200"}`}>
-              ⏱ {formatTime(timeLeft)}
+      <div 
+        className="sticky z-40 bg-gray-50/95 backdrop-blur-md pt-3 pb-4 sm:pt-4 sm:pb-6 -mx-3 px-3 sm:mx-0 sm:px-0 mb-4 sm:mb-8"
+        style={{ top: '57px' }}
+      >
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-md border border-gray-200 flex flex-col gap-3 sm:gap-4">
+          <div className="flex flex-row justify-between items-center gap-2">
+            <div>
+               <h1 className="text-lg sm:text-2xl font-bold text-gray-800">Knowledge Check</h1>
+               <p className="text-blue-600 capitalize font-medium text-xs sm:text-sm mt-0.5">{difficulty} Mode</p>
             </div>
-            <div className="bg-blue-50 text-blue-700 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold border border-blue-100 whitespace-nowrap">
-              {test.totalMarks} Marks
+            <div className="flex gap-1.5 sm:gap-3">
+              <div className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold border flex items-center transition-colors whitespace-nowrap ${timeLeft < 60 ? "bg-red-50 text-red-600 border-red-200 animate-pulse" : "bg-orange-50 text-orange-600 border-orange-200"}`}>
+                 ⏱ {formatTime(timeLeft)}
+              </div>
+              <div className="bg-blue-50 text-blue-700 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold border border-blue-100 whitespace-nowrap">
+                {test.totalMarks} Marks
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* The Progress Bar */}
-        <div>
-          <div className="flex justify-between text-xs sm:text-sm text-gray-600 font-bold mb-1.5">
-            <span>Test Progress</span>
-            <span className="text-blue-600">{answeredQuestions} of {totalQuestions} Answered</span>
-          </div>
-          <div className="w-full bg-gray-100 rounded-full h-2.5 sm:h-3 overflow-hidden border border-gray-200">
-            <div 
-              className="bg-blue-600 h-full rounded-full transition-all duration-500 ease-out relative" 
-              style={{ width: `${progressPercentage}%` }}
-            >
-              <div className="absolute top-0 left-0 right-0 bottom-0 bg-white/20"></div>
+          {/* The Progress Bar */}
+          <div>
+            <div className="flex justify-between text-xs sm:text-sm text-gray-600 font-bold mb-1.5">
+              <span>Test Progress</span>
+              <span className="text-blue-600">{answeredQuestions} of {totalQuestions} Answered</span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2.5 sm:h-3 overflow-hidden border border-gray-200">
+              <div 
+                className="bg-blue-600 h-full rounded-full transition-all duration-500 ease-out relative" 
+                style={{ width: `${progressPercentage}%` }}
+              >
+                <div className="absolute top-0 left-0 right-0 bottom-0 bg-white/20"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -343,7 +393,7 @@ export default function TestPage() {
 
       {test.sections.map((section: any, sIndex: number) => (
         <div key={sIndex} className="mb-6 sm:mb-10 bg-white p-4 sm:p-8 rounded-2xl shadow-sm border border-gray-200">
-          <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-gray-800 border-b border-gray-100 pb-3.5">{section.section}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-gray-800 border-b border-gray-100 pb-3.5">{section.section || section.title}</h2>
 
           {section.questions.map((q: any, qIndex: number) => {
             const key = `${sIndex}-${qIndex}`;
@@ -366,7 +416,7 @@ export default function TestPage() {
                 </div>
 
                 {/* Question Body */}
-                {q.type === "mcq" ? (
+                {q.type === "mcq" && q.options ? (
                   <div className="space-y-2.5 ml-0 sm:ml-12">
                     {q.options.map((opt: string, i: number) => {
                       const isSelected = answers[key] === opt;
