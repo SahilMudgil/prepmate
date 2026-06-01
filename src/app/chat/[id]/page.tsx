@@ -97,6 +97,7 @@ export default function ChatPage() {
         return updatedChat;
       });
     } finally {
+      loading;
       setLoading(false);
     }
   };
@@ -213,38 +214,13 @@ export default function ChatPage() {
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
             {fileUrl ? (
-              <>
-                {/* 💻 Laptop/Desktop Embedded Interactive PDF Viewer */}
-                <iframe 
-                  src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
-                  className="hidden md:block w-full h-full border-none rounded-lg"
-                  title="PDF Viewer"
-                  scrolling="yes"
-                />
-
-                {/* 📱 Mobile Optimized Safe Card View */}
-                <div className="md:hidden flex flex-col items-center justify-center h-full p-4 text-center bg-white rounded-lg border border-gray-100 shadow-sm">
-                  <div className="bg-blue-50 p-3 rounded-xl mb-3 text-blue-600">
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="font-bold text-gray-800 text-sm mb-1 truncate max-w-full px-4">
-                    {decodeURIComponent(fileUrl.split("/").pop() || "Study Material.pdf")}
-                  </h3>
-                  <p className="text-xs text-gray-500 mb-4 px-4">
-                    To read your materials seamlessly with native scrolling, open it in a clean full view tab.
-                  </p>
-                  <a 
-                    href={fileUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-48 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-md block text-center active:scale-95"
-                  >
-                    Open Full PDF ↗
-                  </a>
-                </div>
-              </>
+              /* The iframe is now strictly responsive and renders natively on all devices */
+              <iframe 
+                src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
+                className="w-full h-full border-none rounded-lg"
+                title="PDF Viewer"
+                scrolling="yes"
+              />
             ) : (
               <div className="p-4 sm:p-6 text-gray-500 leading-relaxed whitespace-pre-wrap font-serif text-sm sm:text-base">
                 {docStatus}
