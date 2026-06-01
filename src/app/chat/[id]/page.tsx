@@ -119,7 +119,6 @@ export default function ChatPage() {
       ? fileUrl
       : `${typeof window !== "undefined" ? window.location.origin : ""}${fileUrl}`;
     
-    // Append unique revision parameter to destroy Google's broken empty caches
     const bustedUrl = `${absolute}${absolute.includes("?") ? "&" : "?"}v_rev=${reloadKey}`;
     return `https://docs.google.com/gview?url=${encodeURIComponent(bustedUrl)}&embedded=true`;
   };
@@ -217,7 +216,7 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* DOCUMENT DISPLAY AREA: Shifted to h-[50vh] on mobile to provide maximum space for the embedded document viewer */}
+      {/* DOCUMENT DISPLAY AREA */}
       <div className="w-full xl:w-1/2 h-[50vh] xl:h-full p-2 sm:p-6 flex flex-col bg-gray-100 border-b xl:border-b-0 border-gray-200">
         
         <div className="flex-1 bg-white rounded-xl shadow-md border border-gray-200 p-3 sm:p-6 flex flex-col min-h-0 relative">
@@ -225,13 +224,16 @@ export default function ChatPage() {
           <div className="mb-2 sm:mb-4 border-b pb-2 sm:pb-4 flex justify-between items-center">
             <h2 className="font-bold text-lg sm:text-2xl text-gray-800">Document Content</h2>
             
-            {/* 🔄 Mobile Hot-Reload Button to bypass transient Google loading failures */}
+            {/* ✨ Cleaned & Renamed Mobile Action Button (Hidden on Laptops via md:hidden) */}
             <button
               onClick={handleReloadViewer}
-              className="md:hidden flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-gray-300 transition active:scale-95 shadow-sm"
-              title="Fix broken display"
+              className="md:hidden flex items-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 active:bg-gray-200 px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-300 transition shadow-sm"
+              title="Fix loading glitches"
             >
-              🔄 Reload View
+              <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Reload Document
             </button>
           </div>
 
@@ -250,7 +252,7 @@ export default function ChatPage() {
                   scrolling="yes"
                 />
 
-                {/* 📱 Mobile Optimized Embed Layer */}
+                {/* 📱 Mobile Embedded Viewer */}
                 <iframe 
                   key={reloadKey}
                   src={getMobileViewerUrl()} 
