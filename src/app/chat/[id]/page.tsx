@@ -97,7 +97,6 @@ export default function ChatPage() {
         return updatedChat;
       });
     } finally {
-      loading;
       setLoading(false);
     }
   };
@@ -214,13 +213,26 @@ export default function ChatPage() {
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
             {fileUrl ? (
-              /* The iframe is now strictly responsive and renders natively on all devices */
-              <iframe 
-                src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
-                className="w-full h-full border-none rounded-lg"
-                title="PDF Viewer"
-                scrolling="yes"
-              />
+              <>
+                {/* 💻 Laptop/Desktop Native Interactive Viewer */}
+                <iframe 
+                  src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
+                  className="hidden md:block w-full h-full border-none rounded-lg"
+                  title="Desktop PDF Viewer"
+                  scrolling="yes"
+                />
+
+                {/* 📱 Mobile Document Stream (Bypasses Chrome mobile plugin downloads) */}
+                <iframe 
+                  src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                    fileUrl.startsWith("http") 
+                      ? fileUrl 
+                      : `${typeof window !== "undefined" ? window.location.origin : ""}${fileUrl}`
+                  )}&embedded=true`} 
+                  className="md:hidden w-full h-full border-none rounded-lg"
+                  title="Mobile PDF Viewer"
+                />
+              </>
             ) : (
               <div className="p-4 sm:p-6 text-gray-500 leading-relaxed whitespace-pre-wrap font-serif text-sm sm:text-base">
                 {docStatus}
