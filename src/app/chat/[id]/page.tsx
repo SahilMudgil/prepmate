@@ -14,6 +14,9 @@ export default function ChatPage() {
   
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [docStatus, setDocStatus] = useState("Loading document content...");
+  
+  // Cache-buster state to force-reload the flaky Google Viewer iframe
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -105,11 +108,27 @@ export default function ChatPage() {
     window.print();
   };
 
+  const handleReloadViewer = () => {
+    setReloadKey((prev) => prev + 1);
+  };
+
+  // Construct absolute URL with a shifting cache-buster token for mobile screens
+  const getMobileViewerUrl = () => {
+    if (!fileUrl) return "";
+    const absolute = fileUrl.startsWith("http")
+      ? fileUrl
+      : `${typeof window !== "undefined" ? window.location.origin : ""}${fileUrl}`;
+    
+    // Append unique revision parameter to destroy Google's broken empty caches
+    const bustedUrl = `${absolute}${absolute.includes("?") ? "&" : "?"}v_rev=${reloadKey}`;
+    return `https://docs.google.com/gview?url=${encodeURIComponent(bustedUrl)}&embedded=true`;
+  };
+
   return (
     <div className="flex flex-col-reverse xl:flex-row h-screen bg-gray-50 overflow-hidden font-sans">
       
       {/* CHAT AREA: Bottom on mobile/tablets, Left side on desktop (xl screens) */}
-      <div className="w-full xl:w-1/2 h-[55vh] xl:h-full flex flex-col p-4 sm:p-6 xl:border-r border-gray-200 bg-white shadow-sm z-10">
+      <div className="w-full xl:w-1/2 h-[50vh] xl:h-full flex flex-col p-4 sm:p-6 xl:border-r border-gray-200 bg-white shadow-sm z-10">
         
         <div className="mb-4 xl:mb-6">
           <Link 
@@ -198,13 +217,22 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* DOCUMENT DISPLAY AREA: Top on mobile/tablets, Right side on desktop (xl screens) */}
-      <div className="w-full xl:w-1/2 h-[45vh] xl:h-full p-4 sm:p-6 flex flex-col bg-gray-100 border-b xl:border-b-0 border-gray-200">
+      {/* DOCUMENT DISPLAY AREA: Shifted to h-[50vh] on mobile to provide maximum space for the embedded document viewer */}
+      <div className="w-full xl:w-1/2 h-[50vh] xl:h-full p-2 sm:p-6 flex flex-col bg-gray-100 border-b xl:border-b-0 border-gray-200">
         
-        <div className="flex-1 bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-6 flex flex-col min-h-0 relative">
+        <div className="flex-1 bg-white rounded-xl shadow-md border border-gray-200 p-3 sm:p-6 flex flex-col min-h-0 relative">
           
-          <div className="mb-4 border-b pb-4 flex justify-between items-center">
-            <h2 className="font-bold text-xl sm:text-2xl text-gray-800">Document Content</h2>
+          <div className="mb-2 sm:mb-4 border-b pb-2 sm:pb-4 flex justify-between items-center">
+            <h2 className="font-bold text-lg sm:text-2xl text-gray-800">Document Content</h2>
+            
+            {/* 🔄 Mobile Hot-Reload Button to bypass transient Google loading failures */}
+            <button
+              onClick={handleReloadViewer}
+              className="md:hidden flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-gray-300 transition active:scale-95 shadow-sm"
+              title="Fix broken display"
+            >
+              🔄 Reload View
+            </button>
           </div>
 
           {/* SCROLL WRAPPER FOR THE PDF */}
@@ -222,13 +250,10 @@ export default function ChatPage() {
                   scrolling="yes"
                 />
 
-                {/* 📱 Mobile Document Stream (Bypasses Chrome mobile plugin downloads) */}
+                {/* 📱 Mobile Optimized Embed Layer */}
                 <iframe 
-                  src={`https://docs.google.com/gview?url=${encodeURIComponent(
-                    fileUrl.startsWith("http") 
-                      ? fileUrl 
-                      : `${typeof window !== "undefined" ? window.location.origin : ""}${fileUrl}`
-                  )}&embedded=true`} 
+                  key={reloadKey}
+                  src={getMobileViewerUrl()} 
                   className="md:hidden w-full h-full border-none rounded-lg"
                   title="Mobile PDF Viewer"
                 />
